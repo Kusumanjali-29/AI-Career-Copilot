@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Career Copilot — Your AI-Powered Career Guide</title>
+  <meta name="description" content="AI Career Copilot helps students discover the perfect career path, analyze skill gaps, build learning roadmaps, and get personalized course recommendations — all powered by AI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       TOAST NOTIFICATION
+  ══════════════════════════════════════════════ -->
+  <div id="toast" class="toast">
+    <span class="toast-icon" id="toastIcon">✅</span>
+    <span id="toastMsg">Success!</span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       AUTH MODAL (Login / Register)
+  ══════════════════════════════════════════════ -->
+  <div id="authModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeAuthModal()" id="closeAuthBtn">✕</button>
+
+      <!-- LOGIN PANEL -->
+      <div id="loginPanel" class="auth-panel">
+        <div class="auth-logo">🎓</div>
+        <h2 class="auth-title">Welcome Back!</h2>
+        <p class="auth-sub">Login to continue your AI Career Journey</p>
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email Address</label>
+          <input class="form-input" type="email" id="loginEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary btn-full btn-lg" onclick="loginUser()" id="loginBtn">
+          Login →
+        </button>
+        <p class="auth-switch">Don't have an account?
+          <button onclick="showSignupPanel()" class="link-btn" id="goToSignupBtn">Create Account</button>
+        </p>
+      </div>
+
+      <!-- SIGNUP PANEL -->
+      <div id="signupPanel" class="auth-panel hidden">
+        <div class="auth-logo">🚀</div>
+        <h2 class="auth-title">Create Account</h2>
+        <p class="auth-sub">Start your personalized career journey</p>
+        <div class="form-group">
+          <label class="form-label" for="signupName">Full Name</label>
+          <input class="form-input" type="text" id="signupName" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signupEmail">Email Address</label>
+          <input class="form-input" type="email" id="signupEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signupPassword">Password</label>
+          <input class="form-input" type="password" id="signupPassword" placeholder="Create a password">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <input class="form-input" type="password" id="confirmPassword" placeholder="Repeat your password">
+        </div>
+        <button class="btn btn-primary btn-full btn-lg" onclick="createAccount()" id="createAccountBtn">
+          Create Account →
+        </button>
+        <p class="auth-switch">Already have an account?
+          <button onclick="showLoginPanel()" class="link-btn" id="goToLoginBtn">Login</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SIDEBAR OVERLAY (mobile)
+  ══════════════════════════════════════════════ -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ══════════════════════════════════════════════
+       HAMBURGER (mobile)
+  ══════════════════════════════════════════════ -->
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+
+  <!-- ══════════════════════════════════════════════
+       APP SHELL
+  ══════════════════════════════════════════════ -->
+  <div class="app-shell">
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">
+          <div class="logo-icon">🎓</div>
+          <div class="logo-text">
+            Career Copilot
+            <span>AI-Powered Guidance</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebarNav">
+
+        <div class="nav-section-label">Main</div>
+        <div class="nav-item active" onclick="showView('home')" data-view="home" id="nav-home">
+          <span class="nav-icon">🏠</span> Home
+        </div>
+
+        <div class="nav-section-label">Discover</div>
+        <div class="nav-item" onclick="showView('search')" data-view="search" id="nav-search">
+          <span class="nav-icon">🔍</span> Career Search
+        </div>
+        <div class="nav-item" onclick="showView('categories')" data-view="categories" id="nav-categories">
+          <span class="nav-icon">🗂️</span> Career Categories
+        </div>
+        <div class="nav-item" onclick="showView('recommendations')" data-view="recommendations" id="nav-recommendations">
+          <span class="nav-icon">🎯</span> Recommendations
+          <span class="nav-badge">AI</span>
+        </div>
+
+        <div class="nav-section-label">Analyze</div>
+        <div class="nav-item" onclick="showView('profile')" data-view="profile" id="nav-profile">
+          <span class="nav-icon">👤</span> My Profile
+        </div>
+        <div class="nav-item" onclick="showView('skillassess')" data-view="skillassess" id="nav-skillassess">
+          <span class="nav-icon">🧠</span> Skill Assessment
+        </div>
+        <div class="nav-item" onclick="showView('skillgap')" data-view="skillgap" id="nav-skillgap">
+          <span class="nav-icon">📊</span> Skill Gap Analysis
+        </div>
+
+        <div class="nav-section-label">Grow</div>
+        <div class="nav-item" onclick="showView('roadmap')" data-view="roadmap" id="nav-roadmap">
+          <span class="nav-icon">🗺️</span> Learning Roadmap
+        </div>
+        <div class="nav-item" onclick="showView('courses')" data-view="courses" id="nav-courses">
+          <span class="nav-icon">📚</span> Course Recommendations
+        </div>
+        <div class="nav-item" onclick="showView('resume')" data-view="resume" id="nav-resume">
+          <span class="nav-icon">📄</span> Resume Guidance
+        </div>
+
+        <div class="nav-section-label">You</div>
+        <div class="nav-item" onclick="showView('dashboard')" data-view="dashboard" id="nav-dashboard">
+          <span class="nav-icon">📈</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="showView('about')" data-view="about" id="nav-about">
+          <span class="nav-icon">ℹ️</span> About
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <div id="sidebarUserInfo">
+          <button class="btn btn-outline btn-full" onclick="openAuthModal()" id="sidebarLoginBtn">
+            🔐 Login / Register
+          </button>
+        </div>
+        <div class="sidebar-theme-toggle">
+          <span class="theme-label">🌙 Dark Mode</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="themeToggle" onchange="toggleTheme(this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── MAIN CONTENT ─── -->
+    <main class="main-content" id="mainContent">
+
+      <!-- ══════ TOP NAV BAR ══════ -->
+      <header class="top-nav">
+        <div class="top-nav-left">
+          <span id="currentViewLabel" class="top-nav-title">Home</span>
+        </div>
+        <div class="top-nav-right">
+          <button class="btn btn-secondary btn-sm" onclick="openAuthModal()" id="topNavAuthBtn">
+            🔐 Login
+          </button>
+        </div>
+      </header>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: HOME / LANDING PAGE
+      ══════════════════════════════════════════════ -->
+      <div class="view active" id="view-home">
+
+        <!-- HERO SECTION -->
+        <section class="landing-hero">
+          <div class="hero-bg-glow hero-glow-1"></div>
+          <div class="hero-bg-glow hero-glow-2"></div>
+          <div class="hero-bg-glow hero-glow-3"></div>
+
+          <div class="landing-hero-content">
+            <div class="hero-badge">
+              <span class="badge-dot pulse"></span>
+              AI-Powered Student Career Guidance
+            </div>
+
+            <h1 class="landing-h1">
+              Discover Your
+              <span class="gradient-text">Future Career</span>
+              with AI Copilot
+            </h1>
+
+            <p class="landing-p">
+              Get personalized career recommendations, identify skill gaps, build a learning roadmap,
+              and discover projects that match your ambitions — all powered by AI.
+            </p>
+
+            <div class="hero-cta-group">
+              <button class="btn btn-primary btn-lg hero-cta-primary" onclick="showView('profile')" id="startAnalysisBtn">
+                🚀 Start My Career Analysis
+              </button>
+              <button class="btn btn-secondary btn-lg" onclick="showView('categories')" id="exploreCareersBtn">
+                Explore Careers →
+              </button>
+            </div>
+
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <div class="hero-stat-val">5+</div>
+                <div class="hero-stat-label">Career Paths</div>
+              </div>
+              <div class="hero-stat-divider"></div>
+              <div class="hero-stat">
+                <div class="hero-stat-val">28</div>
+                <div class="hero-stat-label">Skills Tracked</div>
+              </div>
+              <div class="hero-stat-divider"></div>
+              <div class="hero-stat">
+                <div class="hero-stat-val">100%</div>
+                <div class="hero-stat-label">AI-Powered</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="hero-card-float card-float-1">
+              <span>🎯</span> Career Match: 94%
+            </div>
+            <div class="hero-card-float card-float-2">
+              <span>📊</span> Skill Gap: 3 missing
+            </div>
+            <div class="hero-card-float card-float-3">
+              <span>🗺️</span> Roadmap: 5 phases
+            </div>
+            <div class="orbit-ring"></div>
+            <div class="orbit-icon orbit-icon-1">⚙️</div>
+            <div class="orbit-icon orbit-icon-2">🤖</div>
+            <div class="orbit-icon orbit-icon-3">🔬</div>
+            <div class="orbit-icon orbit-icon-4">💻</div>
+          </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section class="landing-section">
+          <div class="section-header">
+            <span class="section-label">What We Offer</span>
+            <h2 class="section-title">Everything You Need to Launch Your Career</h2>
+            <p class="section-desc">From skill analysis to personalized roadmaps — all in one place.</p>
+          </div>
+          <div class="features-grid">
+            <div class="feature-card" onclick="showView('recommendations')" id="featureRecommendations">
+              <div class="feature-icon">🎯</div>
+              <h3>Career Recommendations</h3>
+              <p>AI analyzes your skills and interests to suggest the best-fit career paths for you.</p>
+              <span class="feature-link">Explore →</span>
+            </div>
+            <div class="feature-card" onclick="showView('skillgap')" id="featureSkillGap">
+              <div class="feature-icon">📊</div>
+              <h3>Skill Gap Analysis</h3>
+              <p>Discover exactly which skills you're missing and how to prioritize them.</p>
+              <span class="feature-link">Analyze →</span>
+            </div>
+            <div class="feature-card" onclick="showView('roadmap')" id="featureRoadmap">
+              <div class="feature-icon">🗺️</div>
+              <h3>Learning Roadmap</h3>
+              <p>A step-by-step personalized roadmap with phases, durations, and topics.</p>
+              <span class="feature-link">View Roadmap →</span>
+            </div>
+            <div class="feature-card" onclick="showView('courses')" id="featureCourses">
+              <div class="feature-icon">📚</div>
+              <h3>Course Recommendations</h3>
+              <p>Curated courses and resources tailored to your target career path.</p>
+              <span class="feature-link">Find Courses →</span>
+            </div>
+            <div class="feature-card" onclick="showView('resume')" id="featureResume">
+              <div class="feature-icon">📄</div>
+              <h3>Resume Guidance</h3>
+              <p>Tips and templates to build a resume that stands out to top companies.</p>
+              <span class="feature-link">Get Tips →</span>
+            </div>
+            <div class="feature-card" onclick="showView('skillassess')" id="featureAssess">
+              <div class="feature-icon">🧠</div>
+              <h3>Skill Assessment</h3>
+              <p>Evaluate your current knowledge level across all key technical skills.</p>
+              <span class="feature-link">Assess Now →</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- CAREER CATEGORIES PREVIEW -->
+        <section class="landing-section alt-bg">
+          <div class="section-header">
+            <span class="section-label">Career Paths</span>
+            <h2 class="section-title">Top AI & Tech Career Paths</h2>
+            <p class="section-desc">Explore high-demand careers with strong growth outlooks.</p>
+          </div>
+          <div class="mini-career-grid" id="homeCategoryGrid">
+            <!-- Filled by JS -->
+          </div>
+          <div class="center-btn">
+            <button class="btn btn-outline btn-lg" onclick="showView('categories')" id="viewAllCareersBtn">View All Careers →</button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: CAREER SEARCH
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-search">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Career Search</h1>
+            <p class="page-subtitle">Search for career paths by name or keyword</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="search-bar-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="careerSearchInput" placeholder="Search careers — e.g. Data Scientist, AI, Python…" oninput="searchCareers(this.value)">
+          </div>
+          <div id="searchResults" class="search-results-grid">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: CAREER CATEGORIES
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-categories">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Career Categories</h1>
+            <p class="page-subtitle">Browse all available career paths and select one to explore</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="career-grid" id="categoriesGrid">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: CAREER RECOMMENDATIONS
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-recommendations">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Career Recommendations</h1>
+            <p class="page-subtitle">AI-powered recommendations based on your profile</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div id="recommendationContent">
+            <div class="empty-state">
+              <div class="empty-state-icon">🎯</div>
+              <div class="empty-state-title">Complete Your Profile First</div>
+              <p class="empty-state-desc">Fill in your profile to get personalized AI career recommendations.</p>
+              <button class="btn btn-primary" style="margin-top:20px" onclick="showView('profile')" id="goToProfileBtn">Go to Profile →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: MY PROFILE / CAREER ANALYSIS
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-profile">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">My Profile</h1>
+            <p class="page-subtitle">Tell us about yourself to get personalized recommendations</p>
+          </div>
+        </div>
+        <div class="page-body">
+
+          <!-- Step Indicator -->
+          <div class="step-indicator">
+            <div class="step-wrap">
+              <div class="step-circle active" id="stepCircle1">1</div>
+              <div class="step-label">Profile</div>
+            </div>
+            <div class="step-line" id="stepLine1"></div>
+            <div class="step-wrap">
+              <div class="step-circle" id="stepCircle2">2</div>
+              <div class="step-label">Skills</div>
+            </div>
+            <div class="step-line" id="stepLine2"></div>
+            <div class="step-wrap">
+              <div class="step-circle" id="stepCircle3">3</div>
+              <div class="step-label">Results</div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width:760px;margin:0 auto;">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="studentName">Your Name</label>
+                <input class="form-input" type="text" id="studentName" placeholder="Enter your name">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="year">Year of Study</label>
+                <select class="form-select" id="year">
+                  <option value="">Select year</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="branch">Branch / Major</label>
+              <select class="form-select" id="branch">
+                <option value="">Select your branch</option>
+                <option value="AI & DS">AI & Data Science</option>
+                <option value="CSE">Computer Science</option>
+                <option value="ECE">Electronics & Communication</option>
+                <option value="EEE">Electrical & Electronics</option>
+                <option value="IT">Information Technology</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Your Skills</label>
+              <div id="skillsContainer" class="chip-grid">
+                <!-- Loaded by JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Your Interests</label>
+              <div id="interestsContainer" class="chip-grid">
+                <span class="chip interest-chip" data-val="AI" onclick="toggleChip(this)">Artificial Intelligence</span>
+                <span class="chip interest-chip" data-val="Data" onclick="toggleChip(this)">Data & Analytics</span>
+                <span class="chip interest-chip" data-val="Programming" onclick="toggleChip(this)">Software Development</span>
+                <span class="chip interest-chip" data-val="Research" onclick="toggleChip(this)">Research</span>
+                <span class="chip interest-chip" data-val="Business" onclick="toggleChip(this)">Business & Management</span>
+                <span class="chip interest-chip" data-val="Web" onclick="toggleChip(this)">Web Development</span>
+                <span class="chip interest-chip" data-val="Mobile" onclick="toggleChip(this)">Mobile Development</span>
+                <span class="chip interest-chip" data-val="Cloud" onclick="toggleChip(this)">Cloud Computing</span>
+                <span class="chip interest-chip" data-val="Security" onclick="toggleChip(this)">Cybersecurity</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="careerGoal">Do you have a career goal?</label>
+              <select class="form-select" id="careerGoal">
+                <option value="Undecided">I'm not sure yet</option>
+                <option value="Data Scientist">Data Scientist</option>
+                <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                <option value="AI Engineer">AI Engineer</option>
+                <option value="Data Analyst">Data Analyst</option>
+                <option value="Software Developer">Software Developer</option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-full" onclick="analyzeCareer()" id="analyzeBtn">
+              🔍 Analyze My Career
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: SKILL ASSESSMENT
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-skillassess">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Skill Assessment</h1>
+            <p class="page-subtitle">Rate your proficiency in key tech skills</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="grid-2" id="skillAssessGrid">
+            <!-- Filled by JS -->
+          </div>
+          <div style="margin-top:28px;text-align:center;">
+            <button class="btn btn-primary btn-lg" onclick="saveSkillAssessment()" id="saveAssessBtn">
+              💾 Save My Skill Levels
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: SKILL GAP ANALYSIS
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-skillgap">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Skill Gap Analysis</h1>
+            <p class="page-subtitle">See exactly which skills you need for your target career</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div id="skillGapView">
+            <div class="empty-state">
+              <div class="empty-state-icon">📊</div>
+              <div class="empty-state-title">No Analysis Yet</div>
+              <p class="empty-state-desc">Complete your profile and run the career analysis to see your skill gap.</p>
+              <button class="btn btn-primary" style="margin-top:20px" onclick="showView('profile')" id="skillGapProfileBtn">Go to Profile →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: LEARNING ROADMAP
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-roadmap">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Learning Roadmap</h1>
+            <p class="page-subtitle">Your personalized step-by-step learning plan</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div id="roadmapView">
+            <div class="empty-state">
+              <div class="empty-state-icon">🗺️</div>
+              <div class="empty-state-title">Roadmap Not Generated Yet</div>
+              <p class="empty-state-desc">Complete your profile analysis to get your personalized roadmap.</p>
+              <button class="btn btn-primary" style="margin-top:20px" onclick="showView('profile')" id="roadmapProfileBtn">Go to Profile →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: COURSE RECOMMENDATIONS
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-courses">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Course Recommendations</h1>
+            <p class="page-subtitle">Curated courses for your career path</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div id="coursesView">
+            <div class="empty-state">
+              <div class="empty-state-icon">📚</div>
+              <div class="empty-state-title">Courses Pending</div>
+              <p class="empty-state-desc">Run your career analysis first to get personalized course recommendations.</p>
+              <button class="btn btn-primary" style="margin-top:20px" onclick="showView('profile')" id="coursesProfileBtn">Go to Profile →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: RESUME GUIDANCE
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-resume">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Resume Guidance</h1>
+            <p class="page-subtitle">Build a resume that stands out to top employers</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div id="resumeView">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: STUDENT DASHBOARD
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Student Dashboard</h1>
+            <p class="page-subtitle">Your career journey at a glance</p>
+          </div>
+        </div>
+        <div class="page-body" id="dashboardContent">
+          <div class="empty-state">
+            <div class="empty-state-icon">📈</div>
+            <div class="empty-state-title">Dashboard Empty</div>
+            <p class="empty-state-desc">Complete your career analysis to populate your dashboard.</p>
+            <button class="btn btn-primary" style="margin-top:20px" onclick="showView('profile')" id="dashboardProfileBtn">Get Started →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           VIEW: ABOUT
+      ══════════════════════════════════════════════ -->
+      <div class="view" id="view-about">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">About Career Copilot</h1>
+            <p class="page-subtitle">Built to empower every student with AI</p>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="about-hero">
+            <div class="about-logo">🎓</div>
+            <h2>AI Career Copilot</h2>
+            <p>
+              Career Copilot is an AI-powered student career guidance platform designed to help you
+              navigate the complex world of tech careers — from identifying your strengths to building
+              a personalized roadmap to your dream job.
+            </p>
+          </div>
+
+          <div class="grid-3" style="margin-top:32px;">
+            <div class="card about-card">
+              <div class="about-card-icon">🎯</div>
+              <h3>Personalized Guidance</h3>
+              <p>Every recommendation is tailored to your unique skills, interests, and goals.</p>
+            </div>
+            <div class="card about-card">
+              <div class="about-card-icon">🤖</div>
+              <h3>AI-Ready Platform</h3>
+              <p>Built to integrate with AI APIs (OpenAI, Gemini) for even smarter insights.</p>
+            </div>
+            <div class="card about-card">
+              <div class="about-card-icon">🚀</div>
+              <h3>Action-Oriented</h3>
+              <p>We don't just tell you what to learn — we give you the exact steps to get there.</p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:28px;padding:32px;">
+            <h3 style="margin-bottom:16px;font-family:'Space Grotesk',sans-serif;">🔮 AI Integration Ready</h3>
+            <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">
+              Career Copilot is architected to connect with AI APIs. To enable real-time AI-powered
+              analysis, connect an OpenAI or Gemini API key in the settings. Once connected, the platform
+              will provide:
+            </p>
+            <ul class="about-list">
+              <li>✅ Real-time career match scoring using GPT</li>
+              <li>✅ Personalized advice based on your resume text</li>
+              <li>✅ Dynamic project idea generation</li>
+              <li>✅ Interview question coaching</li>
+              <li>✅ Cover letter and LinkedIn profile drafting</li>
+            </ul>
+            <div class="ai-placeholder-badge">
+              <span>🔌</span> AI API Integration Slot — Connect your API key to unlock
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           FOOTER
+      ══════════════════════════════════════════════ -->
+      <footer class="app-footer">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <span>🎓 AI Career Copilot</span>
+            <p>Built to empower students with AI-powered career guidance.</p>
+          </div>
+          <div class="footer-links">
+            <button onclick="showView('home')" class="footer-link" id="footerHome">Home</button>
+            <button onclick="showView('categories')" class="footer-link" id="footerCategories">Careers</button>
+            <button onclick="showView('roadmap')" class="footer-link" id="footerRoadmap">Roadmap</button>
+            <button onclick="showView('about')" class="footer-link" id="footerAbout">About</button>
+          </div>
+          <div class="footer-copy">© 2026 AI Career Copilot. All rights reserved.</div>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+</body>
+
+</html>
